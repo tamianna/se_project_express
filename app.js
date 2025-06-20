@@ -15,7 +15,7 @@ app.use("/clothingItems", clothingItemRoutes);
 
 app.use((req, res, next) => {
   req.user = {
-    _id: "68558513705d7d68477548aa",
+    _id: "685596fc705d7d68477548ae",
   };
   next();
 });
