@@ -7,7 +7,9 @@ const getClothingItems = async (req, res) => {
 
 const createClothingItem = async (req, res) => {
   try {
-    const { name, weather, imageUrl, owner } = req.body;
+    const { name, weather, imageUrl } = req.body;
+    const owner = req.user._id;
+
     const clothingItem = await ClothingItem.create({ name, weather, imageUrl, owner });
     res.status(201).send(clothingItem);
   } catch (err) {
