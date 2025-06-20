@@ -13,6 +13,13 @@ app.use(express.json());
 app.use('/users', userRoutes);
 app.use('/clothingItems', clothingItemRoutes);
 
+app.use((req, res, next) => {
+  req.user = {
+    _id:'68558513705d7d68477548aa'
+  };
+  next();
+});
+
 //app.get('/', (req, res) => {
 //  res.send('Hello from Express!');
 //});
