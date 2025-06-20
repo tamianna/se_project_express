@@ -20,6 +20,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("*", (req, res) => {
+  res.status(404).send({ message: "Requested resource not found" });
+});
+
 //app.get('/', (req, res) => {
 //  res.send('Hello from Express!');
 //});
