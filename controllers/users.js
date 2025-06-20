@@ -5,7 +5,7 @@ const getUsers = async (req, res) => {
   res.send(users);
 };
 
-const gerUser = async (req, res) => {
+const getUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) return res.status(404).send({ message: 'User not found' });
