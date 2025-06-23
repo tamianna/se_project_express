@@ -43,7 +43,8 @@ const createClothingItem = async (req, res) => {
   }
 };
 
-const deleteClothingItem = async (req, res) => ClothingItem.findByIdAndDelete(req.params.clothingItemId)
+const deleteClothingItem = async (req, res) =>
+  ClothingItem.findByIdAndDelete(req.params.clothingItemId)
     .orFail(() => {
       const error = new Error("Clothing item not found");
       error.statusCode = NOT_FOUND;
@@ -64,7 +65,8 @@ const deleteClothingItem = async (req, res) => ClothingItem.findByIdAndDelete(re
       });
     });
 
-const likeClothingItem = (req, res) => handleLikesClothingItemResponse(
+const likeClothingItem = (req, res) =>
+  handleLikesClothingItemResponse(
     ClothingItem.findByIdAndUpdate(
       req.params.clothingItemId,
       { $addToSet: { likes: req.user._id } },
@@ -73,7 +75,8 @@ const likeClothingItem = (req, res) => handleLikesClothingItemResponse(
     res
   );
 
-const dislikeClothingItem = (req, res) => handleLikesClothingItemResponse(
+const dislikeClothingItem = (req, res) =>
+  handleLikesClothingItemResponse(
     ClothingItem.findByIdAndUpdate(
       req.params.clothingItemId,
       { $pull: { likes: req.user._id } },

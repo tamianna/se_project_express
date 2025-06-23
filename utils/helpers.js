@@ -1,10 +1,11 @@
 const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR } = require("./errors");
 
-const handleLikesClothingItemResponse = (dbQueryPromise, res) => dbQueryPromise
+const handleLikesClothingItemResponse = (dbQueryPromise, res) =>
+  dbQueryPromise
     .orFail(() => {
       const error = new Error("Clothing item not found");
       error.statusCode = NOT_FOUND;
-      throw error;
+      return Promise.reject(error);
     })
     .then((updatedItem) => res.send(updatedItem))
     .catch((err) => {
@@ -14,7 +15,7 @@ const handleLikesClothingItemResponse = (dbQueryPromise, res) => dbQueryPromise
           .status(BAD_REQUEST)
           .send({ message: "Invalid clothing item ID" });
       }
-      res.status(err.statusCode || INTERNAL_SERVER_ERROR).send({
+      return res.status(err.statusCode || INTERNAL_SERVER_ERROR).send({
         message:
           err.statusCode === NOT_FOUND
             ? err.message
