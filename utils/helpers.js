@@ -5,7 +5,7 @@ const handleLikesClothingItemResponse = (dbQueryPromise, res) =>
     .orFail(() => {
       const error = new Error("Clothing item not found");
       error.statusCode = NOT_FOUND;
-      return Promise.reject(error);
+      throw error;
     })
     .then((updatedItem) => res.send(updatedItem))
     .catch((err) => {
