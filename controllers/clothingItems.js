@@ -43,8 +43,7 @@ const createClothingItem = async (req, res) => {
   }
 };
 
-const deleteClothingItem = async (req, res) => {
-  return ClothingItem.findByIdAndDelete(req.params.clothingItemId)
+const deleteClothingItem = async (req, res) => ClothingItem.findByIdAndDelete(req.params.clothingItemId)
     .orFail(() => {
       const error = new Error("Clothing item not found");
       error.statusCode = NOT_FOUND;
@@ -64,10 +63,8 @@ const deleteClothingItem = async (req, res) => {
             : "An error has occured on the server",
       });
     });
-};
 
-const likeClothingItem = (req, res) => {
-  return handleLikesClothingItemResponse(
+const likeClothingItem = (req, res) => handleLikesClothingItemResponse(
     ClothingItem.findByIdAndUpdate(
       req.params.clothingItemId,
       { $addToSet: { likes: req.user._id } },
@@ -75,10 +72,8 @@ const likeClothingItem = (req, res) => {
     ),
     res
   );
-};
 
-const dislikeClothingItem = (req, res) => {
-  return handleLikesClothingItemResponse(
+const dislikeClothingItem = (req, res) => handleLikesClothingItemResponse(
     ClothingItem.findByIdAndUpdate(
       req.params.clothingItemId,
       { $pull: { likes: req.user._id } },
@@ -86,7 +81,6 @@ const dislikeClothingItem = (req, res) => {
     ),
     res
   );
-};
 
 module.exports = {
   getClothingItems,
