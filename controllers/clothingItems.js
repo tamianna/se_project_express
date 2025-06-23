@@ -4,7 +4,7 @@ const {
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
-const handleLikesClothingItemResponse = require("../utils/helpers");
+const { handleLikesClothingItemResponse } = require("../utils/helpers");
 
 const getClothingItems = async (req, res) => {
   try {

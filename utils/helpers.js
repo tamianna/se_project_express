@@ -4,20 +4,20 @@ const {
   INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
 
-const handleLikesClothingItemResponse = (promise, res) => {
-  return promise
+const handleLikesClothingItemResponse = (dbQueryPromise, res) => {
+  return dbQueryPromise
     .orFail(() => {
-      const error = new Error("Item not found");
+      const error = new Error("Clothing item not found");
       error.statusCode = NOT_FOUND;
       throw error;
     })
-    .then((item) => res.send(item))
+    .then((updatedItem) => res.send(updatedItem))
     .catch((err) => {
-      console.error(err);
+      console.error("Caught in helper:", err);
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
-          .send({ message: "Invaild clothing item ID" });
+          .send({ message: "Invalid clothing item ID" });
       }
       res.status(err.statusCode || INTERNAL_SERVER_ERROR).send({
         message:
