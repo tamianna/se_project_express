@@ -65,4 +65,66 @@ const deleteClothingItem = async (req, res) => {
     });
 };
 
-module.exports = { getClothingItems, createClothingItem, deleteClothingItem };
+const likeClothingItem = (req, res) => {
+  ClothingItem.findByIdAndUpdate(
+    req.params.clothingItemId,
+    { $addToSet: { likes: req.user._id } },
+    { new: true }
+  )
+    .orFail(() => {
+      const error = new Error("Item not found");
+      error.statusCode = NOT_FOUND;
+      throw error;
+    })
+    .then((item) => res.send(item))
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invaild clothing item ID" });
+      }
+      res.status(err.statusCode || INTERNAL_SERVER_ERROR).send({
+        message:
+          err.statusCode === NOT_FOUND
+            ? err.message
+            : "An error has occurred on the server",
+      });
+    });
+};
+
+const dislikeClothingItem = (req, res) => {
+  ClothingItem.findByIdAndUpdate(
+    req.params.clothingItemId,
+    { $pull: { likes: req.user._id } },
+    { new: true }
+  )
+    .orFail(() => {
+      const error = new Error("Item not found");
+      error.statusCode = NOT_FOUND;
+      throw error;
+    })
+    .then((item) => res.send(item))
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invaild clothing item ID" });
+      }
+      res.status(err.statusCode || INTERNAL_SERVER_ERROR).send({
+        message:
+          err.statusCode === NOT_FOUND
+            ? err.message
+            : "An error has occurred on the server",
+      });
+    });
+};
+
+module.exports = {
+  getClothingItems,
+  createClothingItem,
+  deleteClothingItem,
+  likeClothingItem,
+  dislikeClothingItem,
+};
