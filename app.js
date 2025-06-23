@@ -31,10 +31,6 @@ app.use("*", (req, res) => {
   res.status(404).send({ message: "Requested resource not found" });
 });
 
-// app.get('/', (req, res) => {
-//  res.send('Hello from Express!');
-// });
-
 app.listen(PORT, () => {
   console.log("Server is running on port ${PORT}");
 });

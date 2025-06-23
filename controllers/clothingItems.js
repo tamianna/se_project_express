@@ -9,10 +9,10 @@ const { handleLikesClothingItemResponse } = require("../utils/helpers");
 const getClothingItems = async (req, res) => {
   try {
     const clothingItems = await ClothingItem.find({}).populate("owner likes");
-    res.send(clothingItems);
+    return res.send(clothingItems);
   } catch (err) {
     console.error(err);
-    res
+    return res
       .status(INTERNAL_SERVER_ERROR)
       .send({ message: "An error has occurred on the server" });
   }
@@ -29,7 +29,7 @@ const createClothingItem = async (req, res) => {
       imageUrl,
       owner,
     });
-    res.status(201).send(clothingItem);
+    return res.status(201).send(clothingItem);
   } catch (err) {
     console.error(err);
     if (err.name === "ValidationError") {
@@ -37,14 +37,14 @@ const createClothingItem = async (req, res) => {
         .status(BAD_REQUEST)
         .send({ message: "Invalid clothing item data" });
     }
-    res
+    return res
       .status(INTERNAL_SERVER_ERROR)
       .send({ message: "An error has occurred on the server" });
   }
 };
 
 const deleteClothingItem = async (req, res) => {
-  ClothingItem.findByIdAndDelete(req.params.clothingItemId)
+  return ClothingItem.findByIdAndDelete(req.params.clothingItemId)
     .orFail(() => {
       const error = new Error("Clothing item not found");
       error.statusCode = NOT_FOUND;
@@ -57,7 +57,7 @@ const deleteClothingItem = async (req, res) => {
           .status(BAD_REQUEST)
           .send({ message: "Invalid clothing item ID" });
       }
-      res.status(err.statusCode || INTERNAL_SERVER_ERROR).send({
+      return res.status(err.statusCode || INTERNAL_SERVER_ERROR).send({
         message:
           err.statusCode === NOT_FOUND
             ? err.message
@@ -67,7 +67,7 @@ const deleteClothingItem = async (req, res) => {
 };
 
 const likeClothingItem = (req, res) => {
-  handleLikesClothingItemResponse(
+  return handleLikesClothingItemResponse(
     ClothingItem.findByIdAndUpdate(
       req.params.clothingItemId,
       { $addToSet: { likes: req.user._id } },
@@ -78,7 +78,7 @@ const likeClothingItem = (req, res) => {
 };
 
 const dislikeClothingItem = (req, res) => {
-  handleLikesClothingItemResponse(
+  return handleLikesClothingItemResponse(
     ClothingItem.findByIdAndUpdate(
       req.params.clothingItemId,
       { $pull: { likes: req.user._id } },
