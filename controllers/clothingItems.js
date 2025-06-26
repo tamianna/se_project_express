@@ -43,7 +43,7 @@ const createClothingItem = async (req, res) => {
   }
 };
 
-const deleteClothingItem = async (req, res) =>
+const deleteClothingItem = (req, res) =>
   ClothingItem.findByIdAndDelete(req.params.clothingItemId)
     .orFail(() => {
       const error = new Error("Clothing item not found");

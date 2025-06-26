@@ -5,7 +5,7 @@ const {
   INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
 
-const getUsers = async (req, res) =>
+const getUsers = (req, res) =>
   User.find({})
     .then((users) => res.send(users))
     .catch((err) => {
@@ -15,7 +15,7 @@ const getUsers = async (req, res) =>
         .send({ message: "An error has occured on the server" });
     });
 
-const getUser = async (req, res) =>
+const getUser = (req, res) =>
   User.findById(req.params.userId)
     .orFail(() => {
       const error = new Error("User not found");
@@ -36,7 +36,7 @@ const getUser = async (req, res) =>
       });
     });
 
-const createUser = async (req, res) => {
+const createUser = (req, res) => {
   const { name, avatar } = req.body;
 
   return User.create({ name, avatar })
