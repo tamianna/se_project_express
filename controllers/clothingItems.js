@@ -3,6 +3,7 @@ const {
   BAD_REQUEST,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
+  FORBIDDEN,
 } = require("../utils/errors");
 const { handleLikesClothingItemResponse } = require("../utils/helpers");
 
@@ -50,7 +51,16 @@ const deleteClothingItem = (req, res) =>
       error.statusCode = NOT_FOUND;
       throw error;
     })
-    .then(() => res.send({ message: "Clothing item deleted" }))
+    .then((item) => {
+      if (item.owner.toString() !== req.user._id) {
+        return res
+          .status(FORBIDDEN)
+          .send({ message: "You are not authorized to delete this item" });
+      }
+      return item.deleteOne().then(() => {
+        res.send({ message: "Clothing item deleted" });
+      });
+    })
     .catch((err) => {
       if (err.name === "CastError") {
         return res
