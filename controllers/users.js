@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
@@ -21,7 +22,10 @@ const createUser = (req, res) => {
       res.status(201).send(userData);
     })
     .catch((err) => {
-      if (err.code === 11000) {
+      if (
+        err.code === 11000 ||
+        (err.name === "MongoServerError" && err.message.includes("E11000"))
+      ) {
         return res.status(CONFLICT).send({ message: "Email already exists" });
       }
       if (err.name === "ValidationError") {
@@ -35,6 +39,17 @@ const createUser = (req, res) => {
 
 const login = (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res
+      .status(BAD_REQUEST)
+      .send({ message: "Email and password are required" });
+  }
+
+  if (!validator.isEmail(email)) {
+    return res.status(BAD_REQUEST).send({ message: "Invalid email format" });
+  }
+
   return User.findByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
@@ -42,8 +57,9 @@ const login = (req, res) => {
       });
       res.send({ token });
     })
-    .catch(() => {
-      res.status(UNAUTHORIZED).send({ message: "Incorrect email or password" });
+    .catch((err) => {
+      const status = err.statusCode || UNAUTHORIZED;
+      res.status(status).send({ message: err.message });
     });
 };
 
@@ -79,7 +95,7 @@ const updateUser = (req, res) => {
         return res.status(BAD_REQUEST).send({ message: "Invalid data" });
       }
       res
-        .send(INTERNAL_SERVER_ERROR)
+        .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error has occurred on the server" });
     });
 };
