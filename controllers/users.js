@@ -1,8 +1,8 @@
-const User = require("../models/user");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
+const User = require("../models/user");
 const {
   BAD_REQUEST,
   NOT_FOUND,
@@ -69,11 +69,11 @@ const getCurrentUser = (req, res) => {
       if (!user) {
         return res.status(NOT_FOUND).send({ message: "User not found" });
       }
-      res.send(user);
+      return res.send(user);
     })
-    .catch((err) => {
-      res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
-    });
+    .catch((err) =>
+      res.status(INTERNAL_SERVER_ERROR).send({ message: err.message })
+    );
 };
 
 const updateUser = (req, res) => {
@@ -88,13 +88,13 @@ const updateUser = (req, res) => {
       if (!user) {
         return res.status(NOT_FOUND).send({ message: "User not found" });
       }
-      res.send(user);
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid data" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error has occurred on the server" });
     });

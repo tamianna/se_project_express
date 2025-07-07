@@ -15,5 +15,5 @@ module.exports = (req, res, next) => {
     return res.status(UNAUTHORIZED).send({ message: "Invalid token" });
   }
   req.user = payload;
-  next();
+  return next();
 };
