@@ -14,7 +14,6 @@ router.post("/signin", login);
 router.post("/signup", createUser);
 
 router.use(auth);
-
 router.get("/me", getCurrentUser);
 router.patch("/me", updateUser);
 
