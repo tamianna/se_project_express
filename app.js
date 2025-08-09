@@ -8,6 +8,7 @@ const { PORT = 3001 } = process.env;
 const routes = require("./routes/index");
 const NotFoundError = require("./errors/NotFoundError");
 const errorHandler = require("./middlewares/error-handler");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const app = express();
 
@@ -19,6 +20,9 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
+// Enable request logger
+app.use(requestLogger);
+
 // Routes
 app.use("/", routes);
 
@@ -26,6 +30,9 @@ app.use("/", routes);
 app.use("*", (req, res, next) => {
   next(new NotFoundError("Requested resource not found"));
 });
+
+// Enable error logger
+app.use(errorLogger);
 
 // celebrate error handler
 app.use(errors());
