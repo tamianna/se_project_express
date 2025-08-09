@@ -1,5 +1,4 @@
-const NotFoundError = require("../errors/NotFoundError");
-const BadRequestError = require("../errors/BadRequestError");
+const { NotFoundError, BadRequestError } = require("../errors");
 
 const handleLikesClothingItemResponse = (dbQueryPromise, res, next) => {
   dbQueryPromise

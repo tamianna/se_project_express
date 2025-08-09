@@ -1,7 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
-const BadRequestError = require("../errors/BadRequestError");
-const NotFoundError = require("../errors/NotFoundError");
-const ForbiddenError = require("../errors/ForbiddenError");
+const { BadRequestError, NotFoundError, ForbiddenError } = require("../errors");
 const { handleLikesClothingItemResponse } = require("../utils/helpers");
 
 const getClothingItems = async (req, res, next) => {
