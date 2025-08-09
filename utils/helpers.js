@@ -1,26 +1,16 @@
-const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR } = require("./errors");
+const NotFoundError = require("../errors/NotFoundError");
+const BadRequestError = require("../errors/BadRequestError");
 
-const handleLikesClothingItemResponse = (dbQueryPromise, res) =>
+const handleLikesClothingItemResponse = (dbQueryPromise, res, next) => {
   dbQueryPromise
-    .orFail(() => {
-      const error = new Error("Clothing item not found");
-      error.statusCode = NOT_FOUND;
-      throw error;
-    })
+    .orFail(() => new NotFoundError("Clothing item not found"))
     .then((updatedItem) => res.send(updatedItem))
     .catch((err) => {
-      console.error("Caught in helper:", err);
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid clothing item ID" });
+        return next(new BadRequestError("Invalid clothing item ID"));
       }
-      return res.status(err.statusCode || INTERNAL_SERVER_ERROR).send({
-        message:
-          err.statusCode === NOT_FOUND
-            ? err.message
-            : "An error has occurred on the server",
-      });
+      next(err);
     });
+};
 
 module.exports = { handleLikesClothingItemResponse };
