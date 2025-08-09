@@ -1,5 +1,3 @@
-const { model } = require("mongoose");
-
 class BadRequestError extends Error {
   constructor(message) {
     super(message);

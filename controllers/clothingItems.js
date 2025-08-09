@@ -5,21 +5,21 @@ const {
   INTERNAL_SERVER_ERROR,
   FORBIDDEN,
 } = require("../utils/errors");
+const BadRequestError = require("../errors/BadRequestError");
+const NotFoundError = require("../errors/NotFoundError");
+const ForbiddenError = require("../errors/ForbiddenError");
 const { handleLikesClothingItemResponse } = require("../utils/helpers");
 
-const getClothingItems = async (req, res) => {
+const getClothingItems = async (req, res, next) => {
   try {
     const clothingItems = await ClothingItem.find({}).populate("owner likes");
     return res.send(clothingItems);
   } catch (err) {
-    console.error(err);
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .send({ message: "An error has occurred on the server" });
+    next(err);
   }
 };
 
-const createClothingItem = async (req, res) => {
+const createClothingItem = async (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
 
@@ -32,30 +32,19 @@ const createClothingItem = async (req, res) => {
     });
     return res.status(201).send(clothingItem);
   } catch (err) {
-    console.error(err);
     if (err.name === "ValidationError") {
-      return res
-        .status(BAD_REQUEST)
-        .send({ message: "Invalid clothing item data" });
+      return next(new BadRequestError("Invaild clothing item data"));
     }
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .send({ message: "An error has occurred on the server" });
+    next(err);
   }
 };
 
-const deleteClothingItem = (req, res) =>
+const deleteClothingItem = (req, res, next) => {
   ClothingItem.findById(req.params.clothingItemId)
-    .orFail(() => {
-      const error = new Error("Clothing item not found");
-      error.statusCode = NOT_FOUND;
-      throw error;
-    })
+    .orFail(() => new NotFoundError("Clothing item not found"))
     .then((item) => {
       if (item.owner.toString() !== req.user._id) {
-        return res
-          .status(FORBIDDEN)
-          .send({ message: "You are not authorized to delete this item" });
+        throw new ForbiddenError("You are not authorized to delete this item");
       }
       return item.deleteOne().then(() => {
         res.send({ message: "Clothing item deleted" });
@@ -63,36 +52,32 @@ const deleteClothingItem = (req, res) =>
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid clothing item ID" });
+        return next(new BadRequestError("Invalid clothing item ID"));
       }
-      return res.status(err.statusCode || INTERNAL_SERVER_ERROR).send({
-        message:
-          err.statusCode === NOT_FOUND
-            ? err.message
-            : "An error has occured on the server",
-      });
+      next(err);
     });
+};
 
-const likeClothingItem = (req, res) =>
+const likeClothingItem = (req, res, next) =>
   handleLikesClothingItemResponse(
     ClothingItem.findByIdAndUpdate(
       req.params.clothingItemId,
       { $addToSet: { likes: req.user._id } },
       { new: true }
     ),
-    res
+    res,
+    next
   );
 
-const dislikeClothingItem = (req, res) =>
+const dislikeClothingItem = (req, res, next) =>
   handleLikesClothingItemResponse(
     ClothingItem.findByIdAndUpdate(
       req.params.clothingItemId,
       { $pull: { likes: req.user._id } },
       { new: true }
     ),
-    res
+    res,
+    next
   );
 
 module.exports = {
