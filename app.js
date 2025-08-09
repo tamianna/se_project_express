@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const helmet = require("helmet");
+const { errors } = require("celebrate");
 
 const { PORT = 3001 } = process.env;
 const routes = require("./routes/index");
@@ -25,6 +26,9 @@ app.use("/", routes);
 app.use("*", (req, res, next) => {
   next(new NotFoundError("Requested resource not found"));
 });
+
+// celebrate error handler
+app.use(errors());
 
 // Centralized error handler (must be last middleware)
 app.use(errorHandler);
