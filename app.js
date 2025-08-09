@@ -1,27 +1,35 @@
 const express = require("express");
-
-const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const helmet = require("helmet");
 
 const { PORT = 3001 } = process.env;
-
 const routes = require("./routes/index");
-const { NOT_FOUND } = require("./utils/errors");
+const NotFoundError = require("./errors/NotFoundError");
+const errorHandler = require("./middlewares/error-handler");
 
+const app = express();
+
+// Connect to MongoDB
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 
+// Security + Middleware
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
+// Routes
 app.use("/", routes);
 
-app.use("*", (req, res) => {
-  res.status(NOT_FOUND).send({ message: "Requested resource not found" });
+// Catch-all for unknown routes
+app.use("*", (req, res, next) => {
+  next(new NotFoundError("Requested resource not found"));
 });
 
+// Centralized error handler (must be last middleware)
+app.use(errorHandler);
+
+// Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
